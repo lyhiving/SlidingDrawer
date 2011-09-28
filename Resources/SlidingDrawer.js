@@ -1,17 +1,7 @@
-var extend = function(obj) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    for (var i = 0; i < args.length; i++) {
-    	var source = args[i];
-      	for (var prop in source) {
-        	if (source[prop] !== void 0) obj[prop] = source[prop];
-      	}
-    }
-    return obj;
-};
-
 var defaults = {
 	position: 'bottom',
 	handleSize: 30,
+	handleBackgroundColor: '#555',
 	handleBackgroundGradient: {
 		type:'linear',
 		colors:[
@@ -69,14 +59,18 @@ exports.createSlidingDrawer = function(o) {
 			borderWidth: 1,
 			borderColor: '#000'
 		});	
-		//handle = extend(handle, ps.handle);
 		handle[position] = 0;
 		handle[ps.dimension] = o.handleSize || defaults.handleSize;
 		handle[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
 		
 		// Handle background styling for handle
 		if (!o.handleBackgroundColor && !o.handleBackgroundGradient) {
-			handle.backgroundGradient = defaults.handleBackgroundGradient;
+			if (Ti.Platform.osname == 'android') {
+				// no dynamic background gradients for android
+				handle.backgroundColor = defaults.handleBackgroundColor;
+			} else {
+				handle.backgroundGradient = defaults.handleBackgroundGradient;
+			}
 		} else {
 			if (o.handleBackgroundColor) {
 				handle.backgroundColor = o.handleBackgroundColor;	
@@ -94,7 +88,6 @@ exports.createSlidingDrawer = function(o) {
 	eventHandle = Ti.UI.createView({
 		height: handle.height
 	});
-	//eventHandle = extend(eventHandle, ps.handle);
 	eventHandle[position] = 0;
 	eventHandle[ps.dimension] = o.handleSize || defaults.handleSize;
 	eventHandle[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
@@ -149,7 +142,7 @@ exports.createSlidingDrawer = function(o) {
 	Ti.Gesture.addEventListener('orientationchange', function(e) {
 		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
 		
-		Ti.API.debug(handle[position] + ' > ' + parentMax);
+		//Ti.API.debug(handle[position] + ' > ' + parentMax);
 		
 		if (handle[position] > parentMax) {
 			handle[position] = parentMax;
