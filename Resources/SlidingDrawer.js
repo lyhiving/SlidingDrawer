@@ -53,6 +53,20 @@ exports.createSlidingDrawer = function(o) {
 	}
 	ps = settings[position];
 	
+	// Make sure we have a content view
+	if (!content) {
+		content = Ti.UI.createView({
+			backgroundColor: '#f00'	
+		});
+	}
+	content[position] = -1 * content[ps.dimension];
+	Ti.API.debug(position + ': ' + content[position]);
+	if (!content[ps.dimension]) {
+		content[ps.dimension] = 'auto';	
+	}
+	content[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
+	Ti.API.debug(content.height + ',' + content.width);
+	
 	if (!handle) {
 		// Create a handle view
 		handle = Ti.UI.createView({
@@ -102,6 +116,7 @@ exports.createSlidingDrawer = function(o) {
 		
 		if (newValue <= parentMax && newValue >= 0) {
 			handle[position] = newValue;
+			content[position] = newValue - content[ps.dimension];
 		}
 		
 		if (lastPos !== undefined && lastPos <= handle[position]) {
@@ -129,10 +144,14 @@ exports.createSlidingDrawer = function(o) {
 		duration *= (direction > 0) ? ((parentMax - handle[position]) / parentMax) : (handle[position] / parentMax);
 		
 		eventHandle.removeEventListener('touchmove', touchmoveHandler);
+		
+		// if handle has not been moved to one extreme or the other, animate there
 		if (handle[position] !== 0 && handle[position] !== parentMax) {
 			var animation = { duration:duration };
 			animation[position] = finalPos;
 			handle.animate(animation);
+			animation[position] = finalPos - content[ps.dimension];
+			content.animate(animation);
 			eventHandle[position] = finalPos;
 		} else {
 			eventHandle[position] = handle[position];		
@@ -142,13 +161,12 @@ exports.createSlidingDrawer = function(o) {
 	Ti.Gesture.addEventListener('orientationchange', function(e) {
 		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
 		
-		//Ti.API.debug(handle[position] + ' > ' + parentMax);
-		
+		// make sure we don't lose the handle on orientation change
 		if (handle[position] > parentMax) {
 			handle[position] = parentMax;
 			eventHandle[position] = parentMax;	
 		}
 	});
 
-	return [handle, eventHandle];
+	return [handle, eventHandle, content];
 };
