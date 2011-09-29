@@ -29,6 +29,7 @@ var viewContent = Ti.UI.createView({
 	height: 'auto',
 	width: 'auto',
 	backgroundColor: '#000',
+	opacity:0.85,
 	borderColor: '#555',
 	borderWidth: 1
 });
