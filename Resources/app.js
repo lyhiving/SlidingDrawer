@@ -28,7 +28,9 @@ var viewContent = Ti.UI.createView({
 	layout: 'vertical', 
 	height: 'auto',
 	width: 'auto',
-	backgroundColor: '#000'
+	backgroundColor: '#000',
+	borderColor: '#555',
+	borderWidth: 1
 });
 for (var i = 0; i < 5; i++) {
 	viewContent.add(Ti.UI.createLabel({
@@ -41,7 +43,7 @@ for (var i = 0; i < 5; i++) {
 }
 
 var handles = require('SlidingDrawer').createSlidingDrawer({ 
-	position:'left',
+	position:'bottom',
 	contentView: viewContent 
 });
 

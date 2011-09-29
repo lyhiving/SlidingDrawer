@@ -106,15 +106,22 @@ exports.createSlidingDrawer = function(o) {
 	eventHandle[ps.dimension] = o.handleSize || defaults.handleSize;
 	eventHandle[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
 	
+	var getSlideMax = function() {
+		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
+		return parentMax <= content[ps.dimension] ? parentMax : content[ps.dimension];	
+	}
+	
 	// create touchmove handler for eventHandle
 	var startPos = undefined;
 	var lastPos = undefined;
 	var direction = 1;
+	
 	var touchmoveHandler = function(e) {
-		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
+		//var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
+		var slideMax = getSlideMax();
 		var newValue = eventHandle[position] + (ps.multiplier * (e[ps.axis] - startPos));
 		
-		if (newValue <= parentMax && newValue >= 0) {
+		if (newValue <= slideMax && newValue >= 0 && newValue <= content.size[ps.dimension]) {
 			handle[position] = newValue;
 			content[position] = newValue - content[ps.dimension];
 		}
@@ -136,35 +143,38 @@ exports.createSlidingDrawer = function(o) {
 	
 	eventHandle.addEventListener('touchend', function(e) {
 		//Ti.API.debug('touchend');
-		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
-		var finalPos = (direction > 0 ? parentMax : 0);
+		// var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
+		// var contentMax = content.width;
+		// var finalMax = parentMax <= contentMax ? parentMax : contentMax;
+		var slideMax = getSlideMax();
+		var slidePos = (direction > 0 ? slideMax : 0);
 		var duration = 660;
 		
 		// reduce the duration as we approach each extreme
-		duration *= (direction > 0) ? ((parentMax - handle[position]) / parentMax) : (handle[position] / parentMax);
+		duration *= (direction > 0) ? ((slideMax - handle[position]) / slideMax) : (handle[position] / slideMax);
 		
 		eventHandle.removeEventListener('touchmove', touchmoveHandler);
 		
 		// if handle has not been moved to one extreme or the other, animate there
-		if (handle[position] !== 0 && handle[position] !== parentMax) {
+		if (handle[position] !== 0 && handle[position] !== slideMax) {
 			var animation = { duration:duration };
-			animation[position] = finalPos;
+			animation[position] = slidePos;
 			handle.animate(animation);
-			animation[position] = finalPos - content[ps.dimension];
+			animation[position] = slidePos - content[ps.dimension];
 			content.animate(animation);
-			eventHandle[position] = finalPos;
+			eventHandle[position] = slidePos;
 		} else {
 			eventHandle[position] = handle[position];		
 		}
 	});
 	
 	Ti.Gesture.addEventListener('orientationchange', function(e) {
-		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
+		var slideMax = getSlideMax();
 		
 		// make sure we don't lose the handle on orientation change
-		if (handle[position] > parentMax) {
-			handle[position] = parentMax;
-			eventHandle[position] = parentMax;	
+		if (handle[position] > slideMax) {
+			handle[position] = slideMax;
+			eventHandle[position] = slideMax;	
 		}
 	});
 
