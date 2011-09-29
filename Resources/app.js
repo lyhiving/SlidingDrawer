@@ -27,25 +27,32 @@ for (var i = 0; i < 5; i++) {
 var viewContent = Ti.UI.createView({
 	layout: 'vertical', 
 	height: 'auto',
-	width: 'auto',
-	backgroundColor: '#000',
-	opacity:0.85,
-	borderColor: '#555',
-	borderWidth: 1
+	borderColor: '#555'
 });
-for (var i = 0; i < 5; i++) {
+var scrollContent = Ti.UI.createScrollView({
+	contentWidth:'auto',
+    contentHeight:'auto',
+    height:300,
+    showVerticalScrollIndicator:true,
+    showHorizontalScrollIndicator:true,
+    backgroundColor:'#000',
+    opacity: 0.85
+});
+for (var i = 0; i < 20; i++) {
 	viewContent.add(Ti.UI.createLabel({
 		text:'Labels inside the sliding drawer.',
 		top:30,
 		height:'auto',
 		width:'auto',
-		color: '#fff'
+		color: '#fff',
+		touchEnabled:false
 	}));
 }
+scrollContent.add(viewContent);
 
 var handles = require('SlidingDrawer').createSlidingDrawer({ 
 	position:'bottom',
-	contentView: viewContent 
+	contentView: scrollContent //viewContent 
 });
 
 win.add(viewBackground);

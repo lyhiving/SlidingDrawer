@@ -117,10 +117,10 @@ exports.createSlidingDrawer = function(o) {
 	var direction = 1;
 	
 	var touchmoveHandler = function(e) {
-		//var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
 		var slideMax = getSlideMax();
 		var newValue = eventHandle[position] + (ps.multiplier * (e[ps.axis] - startPos));
 		
+		Ti.API.info(content.height + ',' + content.width);
 		if (newValue <= slideMax && newValue >= 0 && newValue <= content.size[ps.dimension]) {
 			handle[position] = newValue;
 			content[position] = newValue - content[ps.dimension];
