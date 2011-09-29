@@ -60,12 +60,10 @@ exports.createSlidingDrawer = function(o) {
 		});
 	}
 	content[position] = -1 * content[ps.dimension];
-	Ti.API.debug(position + ': ' + content[position]);
 	if (!content[ps.dimension]) {
 		content[ps.dimension] = 'auto';	
 	}
 	content[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
-	Ti.API.debug(content.height + ',' + content.width);
 	
 	if (!handle) {
 		// Create a handle view
@@ -107,8 +105,8 @@ exports.createSlidingDrawer = function(o) {
 	eventHandle[ps.dimension === 'width' ? 'height' : 'width'] = '100%';
 	
 	var getSlideMax = function() {
-		var parentMax = eventHandle.parent.size[ps.dimension] - eventHandle[ps.dimension];
-		return parentMax <= content[ps.dimension] ? parentMax : content[ps.dimension];	
+		var max = eventHandle.parent.size[ps.dimension] <= content[ps.dimension] ? eventHandle.parent.size[ps.dimension] : content[ps.dimension];
+		return max - eventHandle[ps.dimension];
 	}
 	
 	// create touchmove handler for eventHandle
@@ -120,7 +118,6 @@ exports.createSlidingDrawer = function(o) {
 		var slideMax = getSlideMax();
 		var newValue = eventHandle[position] + (ps.multiplier * (e[ps.axis] - startPos));
 		
-		Ti.API.info(content.height + ',' + content.width);
 		if (newValue <= slideMax && newValue >= 0 && newValue <= content.size[ps.dimension]) {
 			handle[position] = newValue;
 			content[position] = newValue - content[ps.dimension];
